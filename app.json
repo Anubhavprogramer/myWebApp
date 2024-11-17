@@ -22,7 +22,16 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "plugins": [
+      
       "expo-router",
       [
         "expo-splash-screen",
@@ -36,6 +45,9 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_cmVsYXRpdmUtdGFwaXItNTAuY2xlcmsuYWNjb3VudHMuZGV2"
     }
   }
 }
