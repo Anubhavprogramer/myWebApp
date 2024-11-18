@@ -46,7 +46,7 @@ export default function RootLayout() {
   // Log the publishable key for debugging (optional, remove in production)
   // console.log("Publishable Key:", publishableKey);
   // Load custom fonts
-  useFonts({
+  const [fontsLoaded] = useFonts({
     "lexend-regular": require("./../assets/fonts/LexendDeca-Regular.ttf"),
     "lexend-bold": require("./../assets/fonts/LexendDeca-Bold.ttf"),
     "lexend-light": require("./../assets/fonts/LexendDeca-Light.ttf"),
@@ -55,6 +55,9 @@ export default function RootLayout() {
     "lexend-ExtraBold": require("./../assets/fonts/LexendDeca-ExtraBold.ttf"),
   });
 
+  if (!fontsLoaded) {
+    return null; // or a loading spinner
+  }
 
   return (
     <ClerkProvider tokenCache={tokenCache} publishableKey={publishableKey}>
@@ -63,8 +66,14 @@ export default function RootLayout() {
           {/* Main screen */}
           <Stack.Screen name="index" />
           
-          {/* Login screen with header hiddeen */}
+          {/* Login screen with header hidden */}
           <Stack.Screen name="login/index" options={{ headerShown: false }} />
+          
+          {/* Tabs screen */}
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          
+          {/* Fallback route */}
+          <Stack.Screen name="*" options={{ title: "Not Found" }} />
         </Stack>
       </ClerkLoaded>
     </ClerkProvider>
