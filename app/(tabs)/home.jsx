@@ -6,8 +6,10 @@ import PetListByCategory from '../../components/Home/PetListByCategory'
 
 export default function home() {
   return (
-    <View style={{
+    <View 
+    style={{
       padding:20,
+      
       // marginTop:20
     }}>
       {/* header */}
