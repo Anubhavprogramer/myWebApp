@@ -9,11 +9,15 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: Colors.primary,
+        tabBarLabelStyle: { fontFamily: "lexend-light" }, // Add tabBarLabelStyle
       }}
     >
       <Tabs.Screen
         name="home"
         options={{
+          tabBarStyle: {
+            fontFamily: "lexend-light",
+          },
           title: "Home",
           headerShown: false,
           tabBarIcon: ({ color }) => (
@@ -24,7 +28,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "Home",
+          title: "Profile",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="person" size={24} color={color} />
@@ -34,7 +38,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="inbox"
         options={{
-          title: "Home",
+          title: "Chat",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="chatbubble" size={24} color={color} />
@@ -44,7 +48,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="favorite"
         options={{
-          title: "Home",
+          title: "Favorite",
           headerShown: false,
           tabBarIcon: ({ color }) => (
             <Ionicons name="heart" size={24} color={color} />
