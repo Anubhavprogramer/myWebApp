@@ -23,7 +23,10 @@ export default function Favorite() {
   // to collect data
   const GetfavPetdata = async () =>{
     setLoader(true);
-    if (favListid.length === 0) return;
+    if (favListid.length === 0) {
+      setLoader(false); // set loader to false before returning
+      return;
+    }
     const q = query(collection(db, "Pets"),where("id", "in", favListid));
     const querySnapshot = await getDocs(q);
     const petsData = [];
