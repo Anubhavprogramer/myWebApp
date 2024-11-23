@@ -5,6 +5,8 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Pressable,
+  ToastAndroid,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
@@ -13,15 +15,19 @@ import { TextInput } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../Config/FirebaseConfig";
+import * as ImagePicker from "expo-image-picker";
 
 export default function AddnewPet() {
   const navigation = useNavigation();
 
-  const [formData, setFormData] = React.useState();
+  const [formData, setFormData] = React.useState({
+    category: "Dog",
+    sex:"male"
+  });
   const [Gender, setGender] = React.useState();
   const [category, setCategory] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("Dog");
-
+  const [image, setImage] = useState(null);
   useEffect(() => {
     navigation.setOptions({
       title: "Add new Pet",
@@ -37,9 +43,24 @@ export default function AddnewPet() {
         categories.push(doc.data());
       });
       setCategory(categories);
-    //   console.log(categories);
+      //   console.log(categories);
     } catch (error) {
       console.error("Error fetching categories: ", error);
+    }
+  };
+  // Image Picker
+  const getImagePicker = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ["images", "videos"],
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    console.log(result);
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
     }
   };
 
@@ -50,6 +71,16 @@ export default function AddnewPet() {
     });
   };
 
+  const onSubmit = () => {
+    if (Object.keys(formData).length < 8) {
+      ToastAndroid.show("All fields are required",ToastAndroid.SHORT);
+      return;
+    }
+  };
+
+  
+
+
   return (
     <View
       style={{
@@ -57,16 +88,48 @@ export default function AddnewPet() {
       }}
     >
       <ScrollView>
-        <Image
-          source={require("../../assets/images/addPet.png")}
+        <Pressable
           style={{
-            width: "100%",
-            height: 200,
-            resizeMode: "contain",
-            opacity: 0.5,
-            borderRadius: 10,
+            alignItems: "center",
+            justifyContent: "center",
+            marginVertical: 10,
           }}
-        />
+          onPress={getImagePicker}
+        >
+          {image ? (
+            <Image
+              source={{ uri: image }}
+              style={{
+                width: "70%",
+                height: 150,
+                resizeMode: "cover",
+                borderRadius: 10,
+                // shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowColor: Color.secondary,
+                shadowOpacity: 0.2,
+                shadowRadius: 2,
+                elevation: 2,
+              }}
+            />
+          ) : (
+            <Image
+              source={require("../../assets/images/addPet.png")}
+              style={{
+                width: "100%",
+                height: 200,
+                resizeMode: "cover",
+                opacity: 0.5,
+                borderRadius: 10,
+                shadowColor: Color.secondary,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2,
+                shadowRadius: 2,
+                elevation: 2,
+              }}
+            />
+          )}
+        </Pressable>
 
         <View style={styles.box}>
           <Text style={styles.inputContainer}>Pet Name*</Text>
@@ -90,6 +153,16 @@ export default function AddnewPet() {
             style={styles.inputField}
             placeholder="Enter Pet age"
             onChangeText={(value) => handleInputChange("age", value)}
+            keyboardType="numeric-pad"
+          />
+        </View>
+        <View style={styles.box}>
+          <Text style={styles.inputContainer}>Weight*</Text>
+          <TextInput
+            style={styles.inputField}
+            placeholder="Enter Pet Weight"
+            onChangeText={(value) => handleInputChange("weight", value)}
+            keyboardType="numeric-pad"
           />
         </View>
         <View
@@ -163,7 +236,7 @@ export default function AddnewPet() {
           />
         </View>
 
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={onSubmit}>
           <Text
             style={{
               color: Color.white,
