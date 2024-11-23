@@ -30,7 +30,7 @@ export default function Category({ myselectedCategory }) { // Destructure prop
   return (
     <View
       style={{
-        marginTop: 10,
+        marginTop: 4,
       }}
     >
       <Text

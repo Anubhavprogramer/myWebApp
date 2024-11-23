@@ -7,10 +7,12 @@ import PetListItem from './PetListItem'
 
 export default function PetListByCategory() {
   const [petList,setPetList] = useState([])
+  const [loader,setLoader] = useState(false)
   useEffect(()=>{
     getPetList('Dog')
   }, []) // Add dependency array to avoid infinite loops
   const getPetList = async (Category) => {
+    setLoader(true)
     // console.log(Category)
     try {
       // get pet list by category
@@ -29,6 +31,7 @@ export default function PetListByCategory() {
     } catch (error) {
       console.error("Error getting documents: ", error)
     }
+    setLoader(false)
   }
 
   return (
@@ -40,6 +43,8 @@ export default function PetListByCategory() {
         <FlatList
         data={petList}
         horizontal={true}
+        refreshing={loader}
+        onRefresh={()=>getPetList('Dog')}
         renderItem={({item,index})=>{
           return <PetListItem pet={item}/> // Add return statement
         }}

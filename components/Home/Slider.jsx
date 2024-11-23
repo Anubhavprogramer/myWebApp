@@ -23,7 +23,7 @@ export default function Slider() {
     return (
         <View 
         style={{
-            marginTop:10
+            marginTop:3
         }}>
             <FlatList
                 horizontal={true}
@@ -45,9 +45,10 @@ export default function Slider() {
 const styles = StyleSheet.create({
   sliderImage: {
     width: Dimensions.get('window').width*0.9,
-    borderRadius: 10,
-    height: 150,
+    borderRadius: 10, 
+    height: 100,
     marginRight: 10,
     objectFit: 'cover',
+
   },
 })

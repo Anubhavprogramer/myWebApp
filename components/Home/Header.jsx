@@ -14,11 +14,11 @@ export default function Header() {
         <View>
             <Text style={{
                 fontFamily:'lexend-bold',
-                fontSize:17
+                fontSize:15
             }}>Welcome,</Text>
             <Text style={{
                 fontFamily:'lexend-medium',
-                fontSize:20
+                fontSize:17
             }}>{user?.fullName}</Text>
         </View>
         <Image source={{uri:user?.imageUrl}} style={{
