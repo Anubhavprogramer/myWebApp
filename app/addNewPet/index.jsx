@@ -16,6 +16,9 @@ import { Picker } from "@react-native-picker/picker";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../../Config/FirebaseConfig";
 import * as ImagePicker from "expo-image-picker";
+import { uploadImageToCloudinary } from "../../Shared/Cloudinary";
+
+
 
 export default function AddnewPet() {
   const navigation = useNavigation();
@@ -76,6 +79,9 @@ export default function AddnewPet() {
       ToastAndroid.show("All fields are required",ToastAndroid.SHORT);
       return;
     }
+
+    uploadImageToCloudinary(image);
+
   };
 
   
