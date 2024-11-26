@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
-import { useNavigation } from "expo-router";
+import { useNavigation, useRouter } from "expo-router";
 import Color from "../../constants/Color";
 import { TextInput } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -20,6 +20,8 @@ import { useUser } from "@clerk/clerk-expo";
 export default function AddnewPet() {
   const navigation = useNavigation();
   const user = useUser();
+
+  const router = useRouter();
 
   // console.log("User: ", user);
 
@@ -98,6 +100,7 @@ export default function AddnewPet() {
       });
       ToastAndroid.show("Pet added successfully!", ToastAndroid.SHORT);
       console.log("Document written with ID: ", docID);
+      router.replace("/(tabs)/home")
     } catch (error) {
       console.error("Error adding document: ", error);
       ToastAndroid.show("Failed to add pet. Try again later.", ToastAndroid.SHORT);
