@@ -1,0 +1,42 @@
+<Pressable
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            marginVertical: 10,
+          }}
+          onPress={getImagePicker}
+        >
+          {image ? (
+            <Image
+              source={{ uri: image }}
+              style={{
+                width: "70%",
+                height: 150,
+                resizeMode: "cover",
+                borderRadius: 10,
+                // shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowColor: Color.secondary,
+                shadowOpacity: 0.2,
+                shadowRadius: 2,
+                elevation: 2,
+              }}
+            />
+          ) : (
+            <Image
+              source={require("../../assets/images/addPet.png")}
+              style={{
+                width: "100%",
+                height: 200,
+                resizeMode: "cover",
+                opacity: 0.5,
+                borderRadius: 10,
+                shadowColor: Color.secondary,
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2,
+                shadowRadius: 2,
+                elevation: 2,
+              }}
+            />
+          )}
+        </Pressable>

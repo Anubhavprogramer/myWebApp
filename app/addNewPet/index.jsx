@@ -5,38 +5,45 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Pressable,
   ToastAndroid,
+  ActivityIndicator,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import { useNavigation } from "expo-router";
 import Color from "../../constants/Color";
 import { TextInput } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, doc, getDocs, setDoc } from "firebase/firestore";
 import { db } from "../../Config/FirebaseConfig";
-import * as ImagePicker from "expo-image-picker";
-import { uploadImageToCloudinary } from "../../Shared/Cloudinary";
-
-
+import { useUser } from "@clerk/clerk-expo";
 
 export default function AddnewPet() {
   const navigation = useNavigation();
+  const user = useUser();
 
-  const [formData, setFormData] = React.useState({
+  // console.log("User: ", user);
+
+  const [formData, setFormData] = useState({
     category: "Dog",
-    sex:"male"
+    sex: "male",
+    name: "",
+    breed: "",
+    age: "",
+    weight: "",
+    address: "",
+    about: "",
   });
-  const [Gender, setGender] = React.useState();
+  const [Gender, setGender] = useState(formData.sex);
   const [category, setCategory] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState("Dog");
-  const [image, setImage] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(formData.category);
+  const [Loading, setLoading] = useState(false);
+
   useEffect(() => {
     navigation.setOptions({
       title: "Add new Pet",
     });
     GetCategories();
-  }, []);
+  }, [navigation]);
 
   const GetCategories = async () => {
     try {
@@ -46,24 +53,8 @@ export default function AddnewPet() {
         categories.push(doc.data());
       });
       setCategory(categories);
-      //   console.log(categories);
     } catch (error) {
       console.error("Error fetching categories: ", error);
-    }
-  };
-  // Image Picker
-  const getImagePicker = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images", "videos"],
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
     }
   };
 
@@ -74,69 +65,50 @@ export default function AddnewPet() {
     });
   };
 
-  const onSubmit = () => {
-    if (Object.keys(formData).length < 8) {
-      ToastAndroid.show("All fields are required",ToastAndroid.SHORT);
+  const onSubmit = async () => {
+    setLoading(true);
+
+    // Validation for required fields
+    if (
+      !formData.name ||
+      !formData.breed ||
+      !formData.age ||
+      !formData.weight ||
+      !formData.address ||
+      !formData.about
+    ) {
+      ToastAndroid.show("All fields are required", ToastAndroid.SHORT);
+      setLoading(false);
       return;
     }
 
-    uploadImageToCloudinary(image);
+    try {
+      const docID = Date.now().toString();
+      const username = user?.fullName || "Anonymous";
+      const email = user?.primaryEmailAddress?.emailAddress || "no-email@example.com";
+      const userImage = user?.profileImageUrl || "";
 
+
+      await setDoc(doc(db, "Pets", docID), {
+        ...formData,
+        iD: docID,
+        username,
+        email,
+        userImage,
+      });
+      ToastAndroid.show("Pet added successfully!", ToastAndroid.SHORT);
+      console.log("Document written with ID: ", docID);
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      ToastAndroid.show("Failed to add pet. Try again later.", ToastAndroid.SHORT);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  
-
-
   return (
-    <View
-      style={{
-        padding: 10,
-      }}
-    >
+    <View style={{ padding: 10 }}>
       <ScrollView>
-        <Pressable
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            marginVertical: 10,
-          }}
-          onPress={getImagePicker}
-        >
-          {image ? (
-            <Image
-              source={{ uri: image }}
-              style={{
-                width: "70%",
-                height: 150,
-                resizeMode: "cover",
-                borderRadius: 10,
-                // shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowColor: Color.secondary,
-                shadowOpacity: 0.2,
-                shadowRadius: 2,
-                elevation: 2,
-              }}
-            />
-          ) : (
-            <Image
-              source={require("../../assets/images/addPet.png")}
-              style={{
-                width: "100%",
-                height: 200,
-                resizeMode: "cover",
-                opacity: 0.5,
-                borderRadius: 10,
-                shadowColor: Color.secondary,
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.2,
-                shadowRadius: 2,
-                elevation: 2,
-              }}
-            />
-          )}
-        </Pressable>
-
         <View style={styles.box}>
           <Text style={styles.inputContainer}>Pet Name*</Text>
           <TextInput
@@ -154,12 +126,12 @@ export default function AddnewPet() {
           />
         </View>
         <View style={styles.box}>
-          <Text style={styles.inputContainer}>age*</Text>
+          <Text style={styles.inputContainer}>Age*</Text>
           <TextInput
             style={styles.inputField}
-            placeholder="Enter Pet age"
+            placeholder="Enter Pet Age"
             onChangeText={(value) => handleInputChange("age", value)}
-            keyboardType="numeric-pad"
+            keyboardType="numeric"
           />
         </View>
         <View style={styles.box}>
@@ -168,61 +140,34 @@ export default function AddnewPet() {
             style={styles.inputField}
             placeholder="Enter Pet Weight"
             onChangeText={(value) => handleInputChange("weight", value)}
-            keyboardType="numeric-pad"
+            keyboardType="numeric"
           />
         </View>
-        <View
-          style={{
-            backgroundColor: Color.white,
-            borderRadius: 15,
-            marginVertical: 5,
-          }}
-        >
+        <View style={styles.dropdown}>
           <Picker
-            style={[styles.inputContainer, { fontFamily: "lexend-regular" }]}
             selectedValue={Gender}
-            onValueChange={(itemValue, itemIndex) => {
-              setGender(itemValue), handleInputChange("sex", itemValue);
+            onValueChange={(itemValue) => {
+              setGender(itemValue);
+              handleInputChange("sex", itemValue);
             }}
           >
-            <Picker.Item
-              style={{ fontFamily: "lexend-regular" }}
-              label="Male"
-              value="male"
-            />
-            <Picker.Item
-              style={{ fontFamily: "lexend-regular" }}
-              label="Female"
-              value="female"
-            />
+            <Picker.Item label="Male" value="male" />
+            <Picker.Item label="Female" value="female" />
           </Picker>
         </View>
-        <View
-          style={{
-            backgroundColor: Color.white,
-            borderRadius: 15,
-            marginVertical: 5,
-          }}
-        >
+        <View style={styles.dropdown}>
           <Picker
-            style={[styles.inputContainer, { fontFamily: "lexend-regular" }]}
             selectedValue={selectedCategory}
-            onValueChange={(itemValue, itemIndex) => {
-              setSelectedCategory(itemValue),
-                handleInputChange("category", itemValue);
+            onValueChange={(itemValue) => {
+              setSelectedCategory(itemValue);
+              handleInputChange("category", itemValue);
             }}
           >
-            {category.map((category, index) => (
-              <Picker.Item
-                key={index}
-                style={{ fontFamily: "lexend-regular" }}
-                label={category.animal}
-                value={category.animal}
-              />
+            {category.map((cat, index) => (
+              <Picker.Item key={index} label={cat.animal} value={cat.animal} />
             ))}
           </Picker>
         </View>
-
         <View style={styles.box}>
           <Text style={styles.inputContainer}>Address*</Text>
           <TextInput
@@ -236,22 +181,21 @@ export default function AddnewPet() {
           <TextInput
             numberOfLines={5}
             style={[styles.inputField, { lineHeight: 20 }]}
-            multiline={true}
+            multiline
             placeholder="My Dog is Cute"
             onChangeText={(value) => handleInputChange("about", value)}
           />
         </View>
-
-        <TouchableOpacity style={styles.button} onPress={onSubmit}>
-          <Text
-            style={{
-              color: Color.white,
-              fontFamily: "lexend-medium",
-              fontSize: 16,
-            }}
-          >
-            Submit
-          </Text>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={onSubmit}
+          disabled={Loading}
+        >
+          {Loading ? (
+            <ActivityIndicator color={Color.white} />
+          ) : (
+            <Text style={styles.buttonText}>Submit</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </View>
@@ -263,19 +207,21 @@ const styles = StyleSheet.create({
     fontFamily: "lexend-regular",
     fontSize: 12,
     color: Color.primary,
-    // color: Color.gray,
   },
   inputField: {
     padding: 15,
     fontFamily: "lexend-regular",
-    // borderWidth: 1,
-    // borderColor: Color.primary,
     backgroundColor: Color.white,
     borderRadius: 10,
     marginVertical: 3,
   },
   box: {
-    marginVertical: 2,
+    marginVertical: 5,
+  },
+  dropdown: {
+    backgroundColor: Color.white,
+    borderRadius: 15,
+    marginVertical: 5,
   },
   button: {
     backgroundColor: Color.primary,
@@ -283,5 +229,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
     marginVertical: 10,
+  },
+  buttonText: {
+    color: Color.white,
+    fontFamily: "lexend-medium",
+    fontSize: 16,
   },
 });

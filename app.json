@@ -15,7 +15,11 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.anubhav_x_10_tion.myfirstapp"
     },
     "web": {
       "bundler": "metro",
@@ -52,7 +56,13 @@
       "typedRoutes": true
     },
     "extra": {
-      "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_cmVsYXRpdmUtdGFwaXItNTAuY2xlcmsuYWNjb3VudHMuZGV2"
+      "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_cmVsYXRpdmUtdGFwaXItNTAuY2xlcmsuYWNjb3VudHMuZGV2",
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "5544172e-9331-444c-a58b-dfdd8bcaf49b"
+      }
     }
   }
 }
