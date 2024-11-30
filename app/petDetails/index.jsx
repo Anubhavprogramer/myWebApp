@@ -45,7 +45,8 @@ export default function PetDetails() {
     try {
       const docID = `${user.primaryEmailAddress.emailAddress}__${pet.email}`;
       const ID2 = `${pet.email}__${user.primaryEmailAddress.emailAddress}`;
-  
+      // console.log("Initiating chat...", docID);
+      
       const q = query(
         collection(db, "chats"),
         where("id", "in", [docID, ID2])
@@ -54,7 +55,7 @@ export default function PetDetails() {
   
       if (!snapShot.empty) {
         snapShot.forEach((doc) => {
-          // console.log(doc.id, "=>", doc.data());
+          console.log(doc.id, "=>", doc.data());
           router.push({
             pathname: "/chat" ,
             params: { id: doc.id },
@@ -67,13 +68,18 @@ export default function PetDetails() {
             {
               email: user.primaryEmailAddress.emailAddress,
               name: user.fullName || "Unknown",
-              imageURL: user.imageUrl,
+              imageURL: user.imageUrl || "",
             },
             {
               email: pet.email,
               name: pet.name || "Unknown",
-              imageURL: pet.imageURL,
+              imageURL: pet.imageURL || "",
             },
+          ],
+          userIDs:[
+            user.primaryEmailAddress.emailAddress,
+            pet.email
+            
           ],
         };
         await setDoc(doc(db, "chats", docID), chatData);
