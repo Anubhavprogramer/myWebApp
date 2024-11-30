@@ -88,7 +88,7 @@ export default function AddnewPet() {
       const docID = Date.now().toString();
       const username = user?.fullName || "Anonymous";
       const email = user?.primaryEmailAddress?.emailAddress || "no-email@example.com";
-      const userImage = user?.profileImageUrl || "";
+      const userImage = user?.imageUrl || "";
 
 
       await setDoc(doc(db, "Pets", docID), {

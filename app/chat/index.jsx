@@ -13,20 +13,18 @@ export default function ChatScreen() {
   const [otherUserName, setOtherUserName] = useState('');
   const [messages, setMessages] = useState([]);
   const navigation = useNavigation();
-  console.log(user)
 
   useEffect(() => {
     if (params.id) {
       fetchChatDetails();
       const unsubscribe = fetchMessages();
-
       return () => unsubscribe(); // Cleanup on unmount
     }
   }, [params.id]);
 
   useEffect(() => {
     navigation.setOptions({
-      title: otherUserName || 'Chat', // Update navigation title
+      title: otherUserName || 'Chat', // Update navigation title dynamically
     });
   }, [otherUserName]);
 
@@ -41,7 +39,7 @@ export default function ChatScreen() {
       if (docSnap.exists()) {
         const chatData = docSnap.data();
         const otherUser = chatData.users.find(
-          (userItem) => userItem.email !== user.user.email
+          (userItem) => userItem.email !== user?.primaryEmailAddress?.emailAddress
         );
 
         if (otherUser) {
@@ -87,27 +85,26 @@ export default function ChatScreen() {
         createdAt: new Date(), // Current timestamp
         user: {
           _id: user.user.id, // User ID
-          name: user.user.fullName, // User's full name
-          avatar: user.user.ImageUrl || 'https://example.com/default-avatar.png', // Fallback to default avatar
+          name: user.fullName, // User's full name
+          avatar: user.imageUrl || 'https://example.com/default-avatar.png', // Fallback to default avatar
         },
       };
-  
+
       await addDoc(collection(db, 'chats', params.id, 'Messages'), message);
     } catch (error) {
       console.error('Error sending message:', error);
     }
   };
-  
 
   return (
     <GiftedChat
       messages={messages}
       onSend={(messages) => onSend(messages)}
-      showUserAvatar={true}
+      // showUserAvatar={true}
       user={{
         _id: user.user.id,
-        name: user.user.fullName,
-        avatar: user.user.ImageUrl, // Ensure correct property name
+        name: user.fullName,
+        avatar: user.imageUrl || 'https://example.com/default-avatar.png', // Ensure correct property name
       }}
     />
   );
