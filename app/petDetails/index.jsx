@@ -23,8 +23,8 @@ export default function PetDetails() {
   const { user } = useUser();
 
   const router = useRouter();
-  // console.log(pet)
   const navigator = useNavigation();
+
   useEffect(() => {
     navigator.setOptions({
       title: "",
@@ -32,72 +32,85 @@ export default function PetDetails() {
   }, []);
 
   const InitiateChat = async () => {
-    const userId = user?.primaryEmailAddress?.emailAddress + "__" + pet?.email;
-    const ID2 = pet?.email + "__" + user?.primaryEmailAddress?.emailAddress;
-
-    const q = query(
-      collection(db, "chats"),
-      where("chatId", "in", [userId, ID2])
-    );
-    const snapShot = await getDocs(q);
-    // console.log(snapShot);
-
-    if (snapShot.docs?.length == 0) {
-      await setDoc(doc(db, "chats", userId), {
-        id: userId,
-        users: [
-          {
-            email: user?.primaryEmailAddress?.emailAddress,
-            imageURL: user?.imageUrL,
-            name: user?.fullName,
-          },
-          {
-            email: pet?.email,
-            imageURL: pet?.imageURL,
-            name: pet?.name,
-          }
-        ],
-      });
+    if (!user?.primaryEmailAddress?.emailAddress) {
+      console.error("User email is undefined.");
+      return;
     }
-    router.push({
-      pathname: "/ChatScreen",
-      params: { id: userId },
-    });
+  
+    if (!pet?.email) {
+      console.error("Pet email is undefined.");
+      return;
+    }
+  
+    try {
+      const docID = `${user.primaryEmailAddress.emailAddress}__${pet.email}`;
+      const ID2 = `${pet.email}__${user.primaryEmailAddress.emailAddress}`;
+  
+      const q = query(
+        collection(db, "chats"),
+        where("id", "in", [docID, ID2])
+      );
+      const snapShot = await getDocs(q);
+  
+      if (!snapShot.empty) {
+        snapShot.forEach((doc) => {
+          // console.log(doc.id, "=>", doc.data());
+          router.push({
+            pathname: "/chat" ,
+            params: { id: doc.id },
+          });
+        });
+      } else {
+        const chatData = {
+          id: docID,
+          users: [
+            {
+              email: user.primaryEmailAddress.emailAddress,
+              name: user.fullName || "Unknown",
+              imageURL: user.imageUrl,
+            },
+            {
+              email: pet.email,
+              name: pet.name || "Unknown",
+              imageURL: pet.imageURL,
+            },
+          ],
+        };
+        await setDoc(doc(db, "chats", docID), chatData);
+        // console.log("Chat initiated with ID:", docID);
+        router.push({
+          pathname: "/chat",
+          params: { id: docID },
+        });
+      }
+    } catch (error) {
+      console.error("Error initiating chat:", error);
+    }
   };
+  
 
   return (
-    <View>
+    <View style={{ flex: 1 }}>
       <ScrollView>
         <View>
           {/* pet info */}
           <Petinfo pet={pet} />
-          {/* pet props */}
+          {/* pet properties */}
           <PetSubInfo pet={pet} />
-          {/* about */}
+          {/* about pet */}
           <AboutPet pet={pet} />
           {/* owner details */}
           <OwnerInfo pet={pet} />
-          {/* adopt me */}
           <View
             style={{
-              height: 70,
+              height: 200,
             }}
-          ></View>
+          />
         </View>
       </ScrollView>
       <View style={styles.btnContainer}>
         <TouchableOpacity onPress={InitiateChat} style={styles.adoptBtn}>
-          <Text
-            style={{
-              textAlign: "center",
-              color: "white",
-              padding: 10,
-              fontSize: 20,
-              fontFamily: "lexend-bold",
-            }}
-          >
-            Adopt Me
-          </Text>
+          <Text style={styles.adoptText}>Adopt Me</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -107,12 +120,22 @@ export default function PetDetails() {
 const styles = StyleSheet.create({
   adoptBtn: {
     backgroundColor: Color.primary,
-    // borderRadius: 15,
+    padding: 10,
+    borderRadius: 15,
+    marginHorizontal: 20,
+    marginVertical: 10,
+  },
+  adoptText: {
+    textAlign: "center",
+    color: "white",
+    fontSize: 20,
+    fontFamily: "lexend-bold",
   },
   btnContainer: {
     position: "absolute",
     bottom: 0,
     width: "100%",
-    // padding: 10
+    backgroundColor: "white",
+    paddingVertical: 10,
   },
 });
