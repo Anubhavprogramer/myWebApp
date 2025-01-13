@@ -1,7 +1,3 @@
-Here’s an enhanced and more polished version of your README:
-
----
-
 # **MyFirstApp** 🌟  
 Welcome to **MyFirstApp**, a modern pet adoption application built with **Expo** and **React Native**. Users can browse pets, add new ones for adoption, chat with other users, and much more!
 
