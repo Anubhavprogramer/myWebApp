@@ -1,4 +1,4 @@
-# **Adoptly** 🌟  
+# **Adoptly** 🐶  
 Welcome to **MyFirstApp**, a modern pet adoption application built with **Expo** and **React Native**. Users can browse pets, add new ones for adoption, chat with other users, and much more!
 
 ---
@@ -28,8 +28,8 @@ Welcome to **MyFirstApp**, a modern pet adoption application built with **Expo**
 
 ### **Step 1: Clone the Repository**
 ```bash
-git clone https://github.com/yourusername/myfirstapp.git
-cd myfirstapp
+git clone https://github.com/Anubhavprogramer/Adoptly.git
+cd Adoptly
 ```
 
 ### **Step 2: Install Dependencies**
